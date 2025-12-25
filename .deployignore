@@ -1,0 +1,53 @@
+# 部署时忽略的文件
+# 使用 rsync 或 scp 部署时排除这些文件
+
+# 源代码（生产环境不需要）
+src/
+*.ts
+!*.d.ts
+
+# 开发工具和配置
+.vscode/
+.idea/
+*.swp
+*.swo
+tsconfig.json
+nest-cli.json
+.eslintrc.js
+.prettierrc
+
+# 测试文件
+test/
+*.spec.ts
+*.test.ts
+coverage/
+jest.config.js
+
+# 文档（可选，如果需要可以保留 README.md）
+*.md
+!README.md
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# 环境变量模板（生产环境使用实际配置）
+.env.example
+.env.local.example
+.env.development
+.env.test
+
+# 开发依赖的 node_modules（生产环境会重新安装）
+node_modules/
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+.DS_Store
+
+# 其他
+.editorconfig
+.npmrc
+
