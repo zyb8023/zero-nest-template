@@ -4,13 +4,13 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { LoggerService } from '../logger/logger.service';
 
 /**
  * 全局异常过滤器
- * 
+ *
  * 为什么需要全局异常过滤器？
  * 1. 统一异常响应格式
  * 2. 记录异常日志，便于问题排查
@@ -19,7 +19,7 @@ import { LoggerService } from '../logger/logger.service';
  */
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  constructor(private readonly logger: LoggerService) {}
+  private readonly logger = new Logger(HttpExceptionFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -34,7 +34,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
-      
+
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
       } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
@@ -69,16 +69,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const errorResponse = {
       success: false,
       code,
-      message: isProduction && status === HttpStatus.INTERNAL_SERVER_ERROR 
-        ? '服务器内部错误，请稍后重试' 
-        : message,
+      message:
+        isProduction && status === HttpStatus.INTERNAL_SERVER_ERROR
+          ? '服务器内部错误，请稍后重试'
+          : message,
       data: null,
       timestamp: Date.now(),
       path: request.url,
+      requestId: request.id,
       ...(isProduction ? {} : { stack: exception instanceof Error ? exception.stack : undefined }),
     };
 
     response.status(status).json(errorResponse);
   }
 }
-

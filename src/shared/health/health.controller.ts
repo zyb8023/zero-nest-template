@@ -7,10 +7,11 @@ import {
   DiskHealthIndicator,
 } from '@nestjs/terminus';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { RedisHealthIndicator } from './redis.health.indicator';
 
 /**
  * 健康检查控制器
- * 
+ *
  * 为什么需要健康检查？
  * 1. 监控服务运行状态
  * 2. 负载均衡器可以检查服务是否可用
@@ -25,6 +26,7 @@ export class HealthController {
     private db: TypeOrmHealthIndicator,
     private memory: MemoryHealthIndicator,
     private disk: DiskHealthIndicator,
+    private redis: RedisHealthIndicator,
   ) {}
 
   /**
@@ -40,6 +42,8 @@ export class HealthController {
     return this.health.check([
       // 检查数据库连接
       () => this.db.pingCheck('database'),
+      // 检查 Redis 连接
+      this.redis.check('redis'),
       // 检查内存使用（如果超过 1.5GB 则报警）
       () => this.memory.checkHeap('memory_heap', 1500 * 1024 * 1024),
       // 检查磁盘使用（如果超过 80% 则报警）
@@ -62,6 +66,7 @@ export class HealthController {
   detailed() {
     return this.health.check([
       () => this.db.pingCheck('database'),
+      this.redis.check('redis'),
       () => this.memory.checkHeap('memory_heap', 1500 * 1024 * 1024),
       () => this.memory.checkRSS('memory_rss', 1500 * 1024 * 1024),
       () =>
@@ -71,5 +76,38 @@ export class HealthController {
         }),
     ]);
   }
-}
 
+  /**
+   * 存活检查（用于 Kubernetes liveness probe）
+   * GET /api/health/live
+   */
+  @Get('live')
+  @HealthCheck()
+  @ApiOperation({ summary: '存活检查' })
+  @ApiResponse({ status: 200, description: '服务存活' })
+  @ApiResponse({ status: 503, description: '服务不可用' })
+  live() {
+    return this.health.check([
+      // 只检查关键服务
+      () => this.db.pingCheck('database'),
+      this.redis.check('redis'),
+    ]);
+  }
+
+  /**
+   * 就绪检查（用于 Kubernetes readiness probe）
+   * GET /api/health/ready
+   */
+  @Get('ready')
+  @HealthCheck()
+  @ApiOperation({ summary: '就绪检查' })
+  @ApiResponse({ status: 200, description: '服务就绪' })
+  @ApiResponse({ status: 503, description: '服务未就绪' })
+  ready() {
+    return this.health.check([
+      // 检查所有依赖服务
+      () => this.db.pingCheck('database'),
+      this.redis.check('redis'),
+    ]);
+  }
+}

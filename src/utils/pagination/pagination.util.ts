@@ -1,9 +1,13 @@
-import { Repository, FindManyOptions } from 'typeorm';
-import { PaginationDto, PaginationResult } from '../dto/pagination.dto';
+import { Repository, FindManyOptions, ObjectLiteral } from 'typeorm';
+import {
+  PaginationDto,
+  createPaginatedResult,
+  PaginatedResult,
+} from '../../common/dto/pagination.dto';
 
 /**
  * 分页工具类
- * 
+ *
  * 为什么需要分页工具？
  * 1. 统一分页逻辑，避免重复代码
  * 2. 提供标准化的分页查询方法
@@ -16,21 +20,20 @@ export class PaginationUtil {
    * @param paginationDto 分页参数
    * @param options 查询选项
    */
-  static async paginate<T>(
+  static async paginate<T extends ObjectLiteral>(
     repository: Repository<T>,
     paginationDto: PaginationDto,
     options?: FindManyOptions<T>,
-  ): Promise<PaginationResult<T>> {
-    const { page = 1, limit = 10 } = paginationDto;
-    const skip = (page - 1) * limit;
+  ): Promise<PaginatedResult<T>> {
+    const { page = 1, pageSize = 10 } = paginationDto;
+    const skip = (page - 1) * pageSize;
 
     const [items, total] = await repository.findAndCount({
       ...options,
       skip,
-      take: limit,
+      take: pageSize,
     });
 
-    return new PaginationResult(items, total, page, limit);
+    return createPaginatedResult(items, total, page, pageSize);
   }
 }
-

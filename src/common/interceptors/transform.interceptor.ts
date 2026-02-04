@@ -1,46 +1,57 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 /**
- * 统一响应格式拦截器
- * 
- * 为什么需要统一响应格式？
- * 1. 前端可以统一处理响应数据
- * 2. 便于错误处理和日志记录
- * 3. 符合 RESTful API 最佳实践
- * 4. 企业级应用需要标准化的 API 响应格式
+ * 统一响应格式
  */
-export interface ApiResponse<T> {
+export interface ApiResponse<T = any> {
   success: boolean;
   code: number;
   message: string;
   data: T;
   timestamp: number;
   path: string;
+  requestId?: string;
 }
 
+/**
+ * 统一响应格式拦截器
+ *
+ * 功能:
+ * 1. 统一 API 响应格式
+ * 2. 自动添加请求 ID
+ * 3. 使用实际的 HTTP 状态码
+ */
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<T, ApiResponse<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<ApiResponse<T>> {
     const request = context.switchToHttp().getRequest();
+    const response = context.switchToHttp().getResponse();
     const path = request.url;
+    const requestId = request.id;
 
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        code: 200,
-        message: '操作成功',
-        data,
-        timestamp: Date.now(),
-        path,
-      })),
+      map((data) => {
+        // 支持自定义响应格式
+        if (data && typeof data === 'object' && 'success' in data) {
+          return {
+            ...data,
+            requestId,
+          };
+        }
+
+        // 默认响应格式
+        return {
+          success: true,
+          code: response.statusCode,
+          message: data?.message || '操作成功',
+          data: data?.data !== undefined ? data.data : data,
+          timestamp: Date.now(),
+          path,
+          requestId,
+        };
+      }),
     );
   }
 }
-

@@ -9,6 +9,7 @@
 **功能：** 自动设置安全相关的 HTTP 头，防止常见攻击。
 
 **防护内容：**
+
 - XSS（跨站脚本攻击）
 - 点击劫持
 - MIME 类型嗅探
@@ -25,6 +26,7 @@ app.use(helmet());
 **功能：** 防止恶意请求和 DDoS 攻击。
 
 **配置：**
+
 - 默认：每个 IP 每分钟 100 个请求
 - 可配置：通过环境变量 `THROTTLE_TTL` 和 `THROTTLE_LIMIT`
 
@@ -39,6 +41,7 @@ app.use(helmet());
 **配置：** 通过环境变量 `CORS_ORIGINS` 配置允许的域名。
 
 **最佳实践：**
+
 - 开发环境：`CORS_ORIGINS=*`
 - 生产环境：`CORS_ORIGINS=https://yourdomain.com`
 
@@ -49,6 +52,7 @@ app.use(helmet());
 **实现：** 使用 `class-validator` 装饰器
 
 **特性：**
+
 - 自动类型转换
 - 移除未定义属性
 - 友好的错误消息
@@ -60,6 +64,7 @@ app.use(helmet());
 **功能：** 所有 API 响应使用统一格式。
 
 **响应格式：**
+
 ```json
 {
   "success": true,
@@ -78,6 +83,7 @@ app.use(helmet());
 **功能：** 统一处理所有异常，提供友好的错误响应。
 
 **特性：**
+
 - 自动记录错误日志
 - 生产环境隐藏敏感信息
 - 统一的错误格式
@@ -89,6 +95,7 @@ app.use(helmet());
 **功能：** 记录所有 API 请求，便于问题排查和性能分析。
 
 **记录内容：**
+
 - 请求方法、路径、IP
 - 响应状态码
 - 请求耗时
@@ -101,17 +108,20 @@ app.use(helmet());
 **功能：** 监控服务运行状态。
 
 **检查项：**
+
 - 数据库连接
 - 内存使用
 - 磁盘使用
 
 **接口：**
+
 - `GET /api/health` - 基础健康检查
 - `GET /api/health/detailed` - 详细健康检查
 
 **实现位置：** `src/health/health.controller.ts`
 
 **用途：**
+
 - 负载均衡器健康检查
 - 容器编排（Kubernetes）探针
 - 监控系统集成
@@ -125,6 +135,7 @@ app.use(helmet());
 **访问地址：** `http://localhost:3000/api-docs`
 
 **特性：**
+
 - 自动生成文档
 - 在线测试接口
 - JWT 认证支持
@@ -133,6 +144,7 @@ app.use(helmet());
 **实现位置：** `src/config/swagger.config.ts`
 
 **使用方式：**
+
 ```typescript
 @ApiTags('用户管理')
 @ApiOperation({ summary: '创建用户' })
@@ -156,6 +168,7 @@ app.use(compression());
 **功能：** 使用 Redis 缓存热点数据。
 
 **最佳实践：**
+
 - 缓存频繁查询的数据
 - 数据更新时清除相关缓存
 - 设置合理的 TTL
@@ -173,11 +186,12 @@ app.use(compression());
 **功能：** 统一的分页查询方法。
 
 **使用方式：**
+
 ```typescript
 const result = await PaginationUtil.paginate(
   repository,
   { page: 1, limit: 10 },
-  { where: { status: 'active' } }
+  { where: { status: 'active' } },
 );
 ```
 
@@ -188,6 +202,7 @@ const result = await PaginationUtil.paginate(
 **功能：** 支持多版本 API。
 
 **使用方式：**
+
 - `GET /api/v1/users` - 版本 1
 - `GET /api/v2/users` - 版本 2
 
@@ -208,17 +223,20 @@ const result = await PaginationUtil.paginate(
 **功能：** 完整的 Docker 和 Docker Compose 配置。
 
 **文件：**
+
 - `Dockerfile` - 多阶段构建
 - `docker-compose.yml` - 一键启动所有服务
 - `.dockerignore` - 排除不需要的文件
 
 **特性：**
+
 - 多阶段构建（减小镜像大小）
 - 非 root 用户运行（安全）
 - 健康检查
 - 自动重启
 
 **使用方式：**
+
 ```bash
 # 构建镜像
 docker build -t nestjs-app .
@@ -323,4 +341,3 @@ await this.cacheManager.del('key');
 - ✅ **最佳实践**：统一的代码规范
 
 基于这个框架，你可以快速构建企业级后端服务！
-

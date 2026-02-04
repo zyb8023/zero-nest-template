@@ -31,6 +31,7 @@
 设置某个级别后，会输出该级别及更高级别的日志。
 
 例如：
+
 - 设置为 `INFO`，会输出：INFO、WARN、ERROR、FATAL
 - 设置为 `ERROR`，只会输出：ERROR、FATAL
 - 设置为 `DEBUG`，会输出：DEBUG、INFO、WARN、ERROR、FATAL
@@ -39,16 +40,16 @@
 
 ### 日志配置项
 
-| 环境变量 | 说明 | 默认值 | 示例 |
-|---------|------|--------|------|
-| `LOG_CONSOLE_LEVEL` | 控制台日志级别 | 根据环境自动设置 | `debug`, `info`, `warn`, `error` |
-| `LOG_FILE_LEVEL` | 文件日志级别 | 根据环境自动设置 | `debug`, `info`, `warn`, `error` |
-| `LOG_ENABLE_CONSOLE` | 是否启用控制台输出 | `true` | `true`, `false` |
-| `LOG_ENABLE_FILE` | 是否启用文件输出 | `true` | `true`, `false` |
-| `LOG_DIR` | 日志文件目录 | `./logs` | `/var/log/app` |
-| `LOG_MAX_SIZE` | 单个日志文件最大大小（字节） | `10485760` (10MB) | `20971520` (20MB) |
-| `LOG_BACKUPS` | 保留的备份文件数量 | `5` | `10` |
-| `LOG_COMPRESS` | 是否压缩旧日志文件 | `true` | `true`, `false` |
+| 环境变量             | 说明                         | 默认值            | 示例                             |
+| -------------------- | ---------------------------- | ----------------- | -------------------------------- |
+| `LOG_CONSOLE_LEVEL`  | 控制台日志级别               | 根据环境自动设置  | `debug`, `info`, `warn`, `error` |
+| `LOG_FILE_LEVEL`     | 文件日志级别                 | 根据环境自动设置  | `debug`, `info`, `warn`, `error` |
+| `LOG_ENABLE_CONSOLE` | 是否启用控制台输出           | `true`            | `true`, `false`                  |
+| `LOG_ENABLE_FILE`    | 是否启用文件输出             | `true`            | `true`, `false`                  |
+| `LOG_DIR`            | 日志文件目录                 | `./logs`          | `/var/log/app`                   |
+| `LOG_MAX_SIZE`       | 单个日志文件最大大小（字节） | `10485760` (10MB) | `20971520` (20MB)                |
+| `LOG_BACKUPS`        | 保留的备份文件数量           | `5`               | `10`                             |
+| `LOG_COMPRESS`       | 是否压缩旧日志文件           | `true`            | `true`, `false`                  |
 
 ### 不同环境的默认配置
 
@@ -136,13 +137,13 @@ export class YourService {
   someMethod() {
     // 信息日志
     this.logger.log('操作成功');
-    
+
     // 调试日志（开发环境可见）
     this.logger.debug('调试信息', { data: someData });
-    
+
     // 警告日志
     this.logger.warn('需要注意的问题');
-    
+
     // 错误日志
     this.logger.error('操作失败', error.stack);
   }
@@ -230,11 +231,13 @@ tail -n 100 logs/app.log
 ### 日志格式
 
 控制台输出格式：
+
 ```
 [2024-12-01 12:00:00.123 [INFO]] 操作成功
 ```
 
 文件输出格式：
+
 ```
 2024-12-01 12:00:00.123 [INFO] 操作成功
 ```
@@ -246,7 +249,7 @@ tail -n 100 logs/app.log
 修改 `logger.config.ts` 中的 `pattern`：
 
 ```typescript
-pattern: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] [%c] %m'
+pattern: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] [%c] %m';
 // 输出：2024-12-01 12:00:00.123 [INFO] [AppService] 操作成功
 ```
 
@@ -284,4 +287,3 @@ categories: {
 - **易于调试**：开发环境自动启用详细日志
 
 通过合理的日志配置，可以更好地监控和调试应用！
-

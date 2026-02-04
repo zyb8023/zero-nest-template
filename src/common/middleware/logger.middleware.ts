@@ -1,43 +1,61 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { LoggerService } from '../../shared/logger/logger.service';
+import { v4 as uuidv4 } from 'uuid';
+
+// 扩展 Express Request 类型
+declare module 'express' {
+  interface Request {
+    id: string;
+  }
+}
 
 /**
  * 请求日志中间件
- * 
- * 为什么需要请求日志中间件？
- * 1. 记录所有 API 请求，便于问题排查和性能分析
- * 2. 记录请求耗时，监控接口性能
- * 3. 企业级应用需要完整的请求追踪
- * 4. 便于生成访问统计和报表
+ *
+ * 功能:
+ * 1. 为每个请求生成唯一 ID
+ * 2. 记录请求开始和完成信息
+ * 3. 记录请求耗时，监控接口性能
+ * 4. 慢请求告警（超过1秒）
  */
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-  constructor(private readonly logger: LoggerService) {}
+  private readonly logger = new Logger('HTTP');
 
   use(req: Request, res: Response, next: NextFunction) {
+    // 生成请求 ID
+    req.id = uuidv4().replace(/-/g, '');
+
     const { method, originalUrl, ip, headers } = req;
     const userAgent = headers['user-agent'] || '';
     const startTime = Date.now();
 
     // 记录请求开始
-    this.logger.debug(
-      `[请求开始] ${method} ${originalUrl} - IP: ${ip} - User-Agent: ${userAgent}`,
-    );
+    this.logger.log(`[${req.id}] ${method} ${originalUrl} - IP: ${ip} - User-Agent: ${userAgent}`);
 
     // 监听响应完成
     res.on('finish', () => {
       const { statusCode } = res;
+      const contentLength = res.get('content-length');
       const duration = Date.now() - startTime;
-      const logLevel = statusCode >= 400 ? 'warn' : 'info';
+
+      // 慢请求告警（超过1秒）
+      if (duration > 1000) {
+        this.logger.warn(`[${req.id}] 慢请求告警: ${method} ${originalUrl} - ${duration}ms`);
+      }
 
       // 记录请求完成
-      this.logger[logLevel](
-        `[请求完成] ${method} ${originalUrl} - ${statusCode} - ${duration}ms - IP: ${ip}`,
-      );
+      if (statusCode >= 400) {
+        this.logger.warn(
+          `[${req.id}] ${method} ${originalUrl} - ${statusCode} - ${contentLength || 0}B - ${duration}ms`,
+        );
+      } else {
+        this.logger.log(
+          `[${req.id}] ${method} ${originalUrl} - ${statusCode} - ${contentLength || 0}B - ${duration}ms`,
+        );
+      }
     });
 
     next();
   }
 }
-

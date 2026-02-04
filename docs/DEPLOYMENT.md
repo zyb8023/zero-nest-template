@@ -32,12 +32,14 @@ npm run start:prod
 ### 打包前后对比
 
 **打包前（开发环境）：**
+
 - 运行 `npm run start:dev`
 - 使用 `ts-node` 直接运行 TypeScript
 - 需要安装所有开发依赖（TypeScript、@nestjs/cli 等）
 - 支持热重载和自动编译
 
 **打包后（生产环境）：**
+
 - 运行 `npm run start:prod`
 - 运行编译后的 `dist/main.js`
 - 只需要生产依赖
@@ -66,6 +68,7 @@ npm run start:prod
 ### 方式一：只传制成品（推荐，更安全）
 
 **优势：**
+
 - ✅ 不暴露源代码
 - ✅ 传输文件更少，部署更快
 - ✅ 更安全，保护知识产权
@@ -327,6 +330,7 @@ dist/
 ```
 
 **不需要的文件：**
+
 - `src/` - 源代码（已编译到 dist/）
 - `tsconfig.json` - TypeScript 配置（生产环境不需要）
 - `nest-cli.json` - NestJS CLI 配置（生产环境不需要）
@@ -335,21 +339,24 @@ dist/
 ### 打包优化建议
 
 1. **使用生产依赖**：
+
    ```bash
    npm install --production
    # 只安装 dependencies，不安装 devDependencies
    ```
 
 2. **清理缓存**：
+
    ```bash
    npm cache clean --force
    ```
 
 3. **检查打包结果**：
+
    ```bash
    # 检查 dist/ 目录大小
    du -sh dist/
-   
+
    # 检查是否有遗漏的文件
    ls -la dist/
    ```
@@ -372,6 +379,7 @@ npm run start:prod
 ### Q2: 打包后还需要 TypeScript 吗？
 
 **不需要！** 打包后：
+
 - 生产环境只需要 Node.js 运行时
 - 不需要 TypeScript 编译器
 - 不需要 `@nestjs/cli`
@@ -422,6 +430,7 @@ RUN npm run build
 ```
 
 只需要：
+
 ```bash
 docker build -t carto-service:prod .
 ```
@@ -461,23 +470,25 @@ docker build -t carto-service:prod .
 
 ### 对比
 
-| 项目 | 只传制成品 | 上传源码 |
-|------|----------|---------|
-| **传输文件** | 少（只有 dist/、node_modules/） | 多（包含 src/、test/ 等） |
-| **传输速度** | 快 | 慢 |
-| **安全性** | 高（不暴露源码） | 低（暴露源码） |
-| **服务器要求** | 只需 Node.js 运行时 | 需要 TypeScript 编译器 |
-| **部署时间** | 快（无需构建） | 慢（需要构建） |
-| **适用场景** | 生产环境（推荐） | 开发/测试环境 |
+| 项目           | 只传制成品                      | 上传源码                  |
+| -------------- | ------------------------------- | ------------------------- |
+| **传输文件**   | 少（只有 dist/、node_modules/） | 多（包含 src/、test/ 等） |
+| **传输速度**   | 快                              | 慢                        |
+| **安全性**     | 高（不暴露源码）                | 低（暴露源码）            |
+| **服务器要求** | 只需 Node.js 运行时             | 需要 TypeScript 编译器    |
+| **部署时间**   | 快（无需构建）                  | 慢（需要构建）            |
+| **适用场景**   | 生产环境（推荐）                | 开发/测试环境             |
 
 ### 推荐方案
 
 **生产环境：只传制成品**
+
 - ✅ 更安全，不暴露源代码
 - ✅ 部署更快
 - ✅ 服务器不需要构建工具
 
 **开发/测试环境：可以上传源码**
+
 - ✅ 便于调试
 - ✅ 可以修改代码
 
@@ -497,6 +508,7 @@ docker build -t carto-service:prod .
 ```
 
 **不需要的文件：**
+
 - `src/` - 源代码
 - `test/` - 测试文件
 - `*.ts` - TypeScript 源文件
@@ -519,6 +531,7 @@ bash scripts/build-deploy.sh production
 ```
 
 脚本会自动：
+
 1. 安装生产依赖
 2. 构建应用
 3. 打包必要文件

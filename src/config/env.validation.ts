@@ -1,13 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import {
-  IsEnum,
-  IsNumber,
-  IsString,
-  ValidateIf,
-  validateSync,
-  Min,
-  Max,
-} from 'class-validator';
+import { IsEnum, IsNumber, IsString, ValidateIf, validateSync, Min, Max } from 'class-validator';
 
 /**
  * 环境变量枚举
@@ -20,7 +12,7 @@ enum Environment {
 
 /**
  * 环境变量验证类
- * 
+ *
  * 为什么需要环境变量验证？
  * 1. 启动时检查必需的环境变量是否存在
  * 2. 验证环境变量格式是否正确
@@ -37,21 +29,21 @@ class EnvironmentVariables {
   PORT: number = 3000;
 
   @IsString()
-  DB_HOST: string;
+  DB_HOST!: string;
 
   @IsNumber()
   @Min(1)
   @Max(65535)
-  DB_PORT: number;
+  DB_PORT!: number;
 
   @IsString()
-  DB_USERNAME: string;
+  DB_USERNAME!: string;
 
   @IsString()
-  DB_PASSWORD: string;
+  DB_PASSWORD!: string;
 
   @IsString()
-  DB_DATABASE: string;
+  DB_DATABASE!: string;
 
   @IsString()
   @ValidateIf((o) => o.REDIS_HOST)
@@ -90,4 +82,3 @@ export function validate(config: Record<string, unknown>) {
 
   return validatedConfig;
 }
-

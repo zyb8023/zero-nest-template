@@ -40,22 +40,25 @@
 ### 1. 控制器层 (Controller)
 
 **职责：**
+
 - 处理 HTTP 请求和响应
 - 定义 API 路由
 - 参数验证和转换
 - 调用服务层处理业务逻辑
 
 **为什么需要控制器层？**
+
 - 分离关注点：控制器只负责 HTTP 相关，不处理业务逻辑
 - 便于测试：可以单独测试 HTTP 层
 - 统一接口：所有 API 都通过控制器暴露
 
 **示例结构：**
+
 ```typescript
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  
+
   @Get()
   findAll() {
     return this.userService.findAll();
@@ -66,17 +69,20 @@ export class UserController {
 ### 2. 服务层 (Service)
 
 **职责：**
+
 - 实现业务逻辑
 - 数据验证和处理
 - 调用数据访问层
 - 缓存管理
 
 **为什么需要服务层？**
+
 - 业务逻辑复用：多个控制器可以共享同一个服务
 - 便于测试：可以单独测试业务逻辑
 - 代码组织：将复杂的业务逻辑从控制器中分离
 
 **示例结构：**
+
 ```typescript
 @Injectable()
 export class UserService {
@@ -86,7 +92,7 @@ export class UserService {
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
   ) {}
-  
+
   async findAll(): Promise<User[]> {
     // 业务逻辑
   }
@@ -96,22 +102,25 @@ export class UserService {
 ### 3. 数据访问层 (Repository)
 
 **职责：**
+
 - 数据库 CRUD 操作
 - 查询构建
 - 事务管理
 
 **为什么使用 TypeORM Repository？**
+
 - 类型安全：TypeScript 类型检查
 - 无需写 SQL：使用 TypeScript 方法操作数据库
 - 自动映射：实体类自动映射到数据库表
 
 **示例结构：**
+
 ```typescript
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
-  
+
   @Column()
   username: string;
 }
@@ -120,16 +129,19 @@ export class User {
 ### 4. 数据传输对象 (DTO)
 
 **职责：**
+
 - 定义 API 输入输出格式
 - 数据验证
 - 类型安全
 
 **为什么需要 DTO？**
+
 - 数据验证：使用 class-validator 自动验证
 - 类型安全：TypeScript 类型检查
 - 文档化：DTO 本身就是接口文档
 
 **示例结构：**
+
 ```typescript
 export class CreateUserDto {
   @IsNotEmpty()
@@ -143,16 +155,19 @@ export class CreateUserDto {
 ### 1. 配置模块 (ConfigModule)
 
 **作用：**
+
 - 统一管理环境变量
 - 支持多环境配置（开发、测试、生产）
 - 类型安全的配置访问
 
 **为什么需要配置模块？**
+
 - 环境隔离：不同环境使用不同配置
 - 安全性：敏感信息不硬编码
 - 灵活性：可以轻松切换配置
 
 **使用方式：**
+
 ```typescript
 constructor(private configService: ConfigService) {
   const dbHost = this.configService.get<string>('DB_HOST');
@@ -162,16 +177,19 @@ constructor(private configService: ConfigService) {
 ### 2. 数据库模块 (TypeOrmModule)
 
 **作用：**
+
 - 管理数据库连接
 - 提供 Repository 模式
 - 支持数据库迁移
 
 **为什么使用 TypeORM？**
+
 - ORM 优势：用对象操作数据库，无需写 SQL
 - 类型安全：TypeScript 支持
 - 功能强大：支持关系、事务、迁移等
 
 **配置要点：**
+
 - `synchronize`: 开发环境可用，生产环境应使用迁移
 - `logging`: 开发环境开启，生产环境关闭
 - `entities`: 实体文件路径
@@ -179,16 +197,19 @@ constructor(private configService: ConfigService) {
 ### 3. 缓存模块 (CacheModule)
 
 **作用：**
+
 - 缓存热点数据
 - 减少数据库查询
 - 提高应用性能
 
 **为什么使用 Redis？**
+
 - 高性能：内存数据库，读写速度快
 - 持久化：支持数据持久化
 - 功能丰富：支持多种数据结构
 
 **使用方式：**
+
 ```typescript
 // 获取缓存
 const cached = await this.cacheManager.get('key');
@@ -203,16 +224,19 @@ await this.cacheManager.del('key');
 ### 4. 日志模块 (LoggerModule)
 
 **作用：**
+
 - 统一日志格式
 - 文件输出和轮转
 - 日志分级（error, warn, info, debug）
 
 **为什么使用 Log4js？**
+
 - 功能强大：支持多种输出方式
 - 日志轮转：自动管理日志文件大小
 - 性能优化：异步写入，不影响主线程
 
 **日志级别：**
+
 - `error`: 错误信息，需要立即处理
 - `warn`: 警告信息，需要注意但不影响运行
 - `info`: 一般信息，记录正常操作
@@ -223,6 +247,7 @@ await this.cacheManager.del('key');
 ### 模块结构
 
 每个业务模块应包含：
+
 ```
 module-name/
 ├── module-name.module.ts    # 模块定义
@@ -237,6 +262,7 @@ module-name/
 ### 模块注册
 
 在 `app.module.ts` 中注册模块：
+
 ```typescript
 @Module({
   imports: [
@@ -251,11 +277,13 @@ module-name/
 NestJS 使用依赖注入（DI）模式管理依赖关系。
 
 **为什么使用依赖注入？**
+
 - 解耦：模块之间不直接依赖，通过接口依赖
 - 测试：可以轻松替换依赖进行测试
 - 管理：框架自动管理对象的创建和生命周期
 
 **使用方式：**
+
 ```typescript
 @Injectable()
 export class UserService {
@@ -291,6 +319,7 @@ export class UserService {
 ### 1. 错误处理
 
 使用 NestJS 内置异常：
+
 ```typescript
 throw new NotFoundException('资源不存在');
 throw new BadRequestException('请求参数错误');
@@ -300,6 +329,7 @@ throw new ConflictException('资源冲突');
 ### 2. 数据验证
 
 使用 class-validator：
+
 ```typescript
 @IsNotEmpty()
 @IsString()
@@ -357,6 +387,7 @@ Controller (HTTP 响应)
 ### 添加中间件
 
 在 `main.ts` 中添加：
+
 ```typescript
 app.use(yourMiddleware);
 ```
@@ -364,6 +395,7 @@ app.use(yourMiddleware);
 ### 添加全局守卫
 
 在 `main.ts` 中添加：
+
 ```typescript
 app.useGlobalGuards(new YourGuard());
 ```
@@ -371,6 +403,7 @@ app.useGlobalGuards(new YourGuard());
 ### 添加拦截器
 
 在 `main.ts` 中添加：
+
 ```typescript
 app.useGlobalInterceptors(new YourInterceptor());
 ```
@@ -380,6 +413,7 @@ app.useGlobalInterceptors(new YourInterceptor());
 ### NestJS
 
 **为什么选择 NestJS？**
+
 - TypeScript 原生支持
 - 模块化架构
 - 依赖注入
@@ -389,6 +423,7 @@ app.useGlobalInterceptors(new YourInterceptor());
 ### TypeORM
 
 **为什么选择 TypeORM？**
+
 - TypeScript 支持
 - 装饰器语法
 - 自动迁移
@@ -397,6 +432,7 @@ app.useGlobalInterceptors(new YourInterceptor());
 ### Redis
 
 **为什么选择 Redis？**
+
 - 高性能
 - 丰富的数据结构
 - 持久化支持
@@ -405,6 +441,7 @@ app.useGlobalInterceptors(new YourInterceptor());
 ### Log4js
 
 **为什么选择 Log4js？**
+
 - 功能强大
 - 日志轮转
 - 多种输出方式
@@ -415,6 +452,7 @@ app.useGlobalInterceptors(new YourInterceptor());
 ### 1. 查看日志
 
 日志文件位置：`logs/`
+
 - `app.log`: 所有日志
 - `error.log`: 错误日志
 
@@ -433,6 +471,7 @@ npm run start:debug
 ## 📖 总结
 
 这个框架提供了：
+
 - ✅ 完整的项目结构
 - ✅ 数据库集成（MySQL + TypeORM）
 - ✅ 缓存集成（Redis）
@@ -443,4 +482,3 @@ npm run start:debug
 - ✅ 最佳实践
 
 基于这个框架，你可以快速开发任何后端服务项目！
-

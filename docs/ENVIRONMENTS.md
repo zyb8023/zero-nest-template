@@ -29,26 +29,31 @@
 ### 配置文件说明
 
 #### .env.example
+
 - 环境变量模板文件
 - 包含所有可配置的变量
 - 提交到 Git，作为参考
 
 #### .env.local.example
+
 - 本地环境配置模板
 - 复制为 `.env.local` 使用
 - 不提交到 Git（在 .gitignore 中）
 
 #### .env.development
+
 - 开发环境配置
 - 提交到 Git
 - 用于团队开发
 
 #### .env.production
+
 - 生产环境配置
 - 提交到 Git（敏感信息应使用环境变量注入）
 - 用于生产部署
 
 #### .env.test
+
 - 测试环境配置
 - 提交到 Git
 - 用于自动化测试
@@ -113,7 +118,7 @@ docker-compose --env-file .env.production up
 services:
   app:
     env_file:
-      - .env.production  # 指定环境文件
+      - .env.production # 指定环境文件
     environment:
       - NODE_ENV=production
 ```
@@ -247,4 +252,3 @@ console.log(process.env.DB_HOST);
 - **生产环境**：使用 PM2 进程管理器
 - **容器化**：使用 Docker + Docker Compose
 - **最安全**：使用环境变量注入 + 密钥管理服务
-
